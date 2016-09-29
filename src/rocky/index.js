@@ -1,40 +1,37 @@
 var rocky = require('rocky');
 
-rocky.on('draw', function(event) {
-  // Get the CanvasRenderingContext2D object
-  var ctx = event.context;
+var dataLogs = [];
 
-  // Clear the screen with default .fillStyle = 'black'
-  ctx.clearRect(0, 0, ctx.canvas.clientWidth, ctx.canvas.clientHeight);
-
-  // As the screen could be partly covered by system UI
-  // we are asking for the unobstructed screen area
-  // This way, we can make sure our content is always fully visible
-  var w = ctx.canvas.unobstructedWidth;
-  var h = ctx.canvas.unobstructedHeight;
-
-  // Current date/time
-  var d = new Date();
-
-  // Set the text color and alignment
-  ctx.fillStyle = 'white';
-  ctx.textAlign = 'center';
-
-  // Display the time, in the middle of the screen
-  // Note that we refresh the screen only once a minute (see below)
-  // whereas .toLocaleTimeString() also contains seconds
-  // Your first step as a watchface developer could be to make this more awesome :)
-  ctx.fillText(d.toLocaleTimeString(), w / 2, h / 2, w);
+// Triggered when memory pressure is an issue
+rocky.on('memorypressure', function(event) {
+  switch(event.level) {
+    case 'high':
+      // Memory pressure is high, free some memory
+      dataLogs = [];
+      console.log('relieved the pressure');
+      break;
+    case 'normal':
+    case 'low':
+      // Not implemented
+      break;
+  }
 });
 
 rocky.on('minutechange', function(event) {
-  // Callback will be executed on each new full minute
-  // If you need a higher or lower frequency, try 'secondchange' or 'hourchange'
-  // Note: more frequent updates mean more battery consumption (e.g. 60x)
-
-  // Display a message in the system logs
-  console.log("Another minute with your Pebble!");
-
-  // Request the screen to be redrawn at the next possible time
   rocky.requestDraw();
+  // Fill the logs to increase memory pressure
+  for(var i=0;i<250;i++) {
+    dataLogs.push([new Date(), 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.']);
+  }
+});
+
+// Draw the current time on screen
+rocky.on('draw', function(event) {
+  var ctx = event.context;
+  ctx.clearRect(0, 0, ctx.canvas.clientWidth, ctx.canvas.clientHeight);
+  var w = ctx.canvas.unobstructedWidth;
+  var h = ctx.canvas.unobstructedHeight;
+  ctx.fillStyle = 'white';
+  ctx.textAlign = 'center';
+  ctx.fillText(new Date().toLocaleTimeString(), w / 2, h / 2, w);
 });
