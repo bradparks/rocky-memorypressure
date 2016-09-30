@@ -1,14 +1,17 @@
 var rocky = require('rocky');
 
 var dataLogs = [];
+var memoryPressureHitCount = 0;
 
 // Triggered when memory pressure is an issue
 rocky.on('memorypressure', function(event) {
+  console.log('memory pressure event: ' + event.level);
   switch(event.level) {
     case 'high':
       // Memory pressure is high, free some memory
       dataLogs = [];
       console.log('relieved the pressure');
+      memoryPressureHitCount++;
       break;
     case 'normal':
     case 'low':
@@ -17,11 +20,13 @@ rocky.on('memorypressure', function(event) {
   }
 });
 
-rocky.on('minutechange', function(event) {
+rocky.on('secondchange', function(event) {
   rocky.requestDraw();
-  // Fill the logs to increase memory pressure
-  for(var i=0;i<250;i++) {
-    dataLogs.push([new Date(), 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.']);
+  if(event.date.getSeconds() % 5 === 0) {
+    // Fill array to increase memory pressure
+    for(var i=0;i<100;i++) {
+      dataLogs.push([event.date, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.']);
+    }
   }
 });
 
@@ -33,5 +38,6 @@ rocky.on('draw', function(event) {
   var h = ctx.canvas.unobstructedHeight;
   ctx.fillStyle = 'white';
   ctx.textAlign = 'center';
-  ctx.fillText(new Date().toLocaleTimeString(), w / 2, h / 2, w);
+  var text = new Date().toLocaleTimeString() + '\nPressureHits: ' + memoryPressureHitCount;
+  ctx.fillText(text, w / 2, h / 2, w);
 });
