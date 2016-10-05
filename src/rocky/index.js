@@ -5,7 +5,6 @@ var memoryPressureHitCount = 0;
 
 // Triggered when memory pressure is an issue
 rocky.on('memorypressure', function(event) {
-  console.log('memory pressure event: ' + event.level);
   switch(event.level) {
     case 'high':
       // Memory pressure is high, free some memory
@@ -15,9 +14,10 @@ rocky.on('memorypressure', function(event) {
       break;
     case 'normal':
     case 'low':
-      // Not implemented
+      // Not yet implemented
       break;
   }
+  console.log('memory pressure occurred. level=' + event.level);
 });
 
 rocky.on('secondchange', function(event) {
