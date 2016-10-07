@@ -7,7 +7,7 @@ in Rocky.js Pebble applications.
 
 [Rocky.js Documentation](https://developer.pebble.com/docs/rockyjs/rocky/#RockyMemoryPressureCallback)
 
-
+> Requires Pebble SDK/firmware 4.2
 
 ## License
 
